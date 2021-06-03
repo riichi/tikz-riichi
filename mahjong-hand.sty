@@ -20,7 +20,7 @@
 \def\@eaC{\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter}
 \def\@eaD{\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter}
 
-\def\@TilePause{\addtolength{\@mahjongtilexoffset}{0.5\@mahjongtilewidth}\global\@mahjongtilexoffset=\@mahjongtilexoffset}
+\def\@TilePause #1#2#3{\addtolength{\@mahjongtilexoffset}{0.5\@mahjongtilewidth}\global\@mahjongtilexoffset=\@mahjongtilexoffset}
 \def\@DrawNormalTile #1{
     \addtolength{\@mahjongtilerightedge}{\@mahjongtilewidth}
     \node [
@@ -69,19 +69,19 @@
     ] (rect) {};
     \setlength{\@mahjongtilexoffset}{\@mahjongtilerightedge}
     \global\@mahjongtilexoffset=\@mahjongtilexoffset}
-\def\@DrawTile #1#2{
-    \setlength{\@mahjongtilerightedge}{\@mahjongtilexoffset}
-    \ifx#2*
-        \expandafter\@DrawRotatedTile
-    \else
-        \expandafter\@DrawNormalTile
+\def\@DrawTile #1#2{%
+    \setlength{\@mahjongtilerightedge}{\@mahjongtilexoffset}%
+    \ifx#2*%
+        \expandafter\@DrawRotatedTile%
+    \else%
+        \expandafter\@DrawNormalTile%
     \fi {tiles/#1.pdf}}
-\def\@DrawTileBack #1{
-    \setlength{\@mahjongtilerightedge}{\@mahjongtilexoffset}
-    \ifx#1*
-        \expandafter\@DrawRotatedBack
-    \else
-        \expandafter\@DrawNormalBack
+\def\@DrawTileBack #1#2#3{%
+    \setlength{\@mahjongtilerightedge}{\@mahjongtilexoffset}%
+    \ifx#3*%
+        \expandafter\@DrawRotatedBack%
+    \else%
+        \expandafter\@DrawNormalBack%
     \fi}
 
 \def\DrawHand #1#2{%
@@ -103,15 +103,15 @@
 \def\@ParserHead #1#2{\ifx#2\relax\expandafter\@EatTwo\else\expandafter\@MoveHead\fi#1#2}
 \def\@ProcessCharsX #1#2#3{\ifx#2*\expandafter\relax\else\@ProcessCharsY#1#2#3\fi}
 \def\@ProcessCharsY #1#2#3{%
-    \ifx#2~\@TilePause%
-    \else\ifx#2?\@DrawTileBack#3%
-    \else
-        \ifx#1m\@ProcessCharsZ{Man}#2#3\fi%
-        \ifx#1p\@ProcessCharsZ{Pin}#2#3\fi%
-        \ifx#1s\@ProcessCharsZ{Sou}#2#3\fi%
-        \ifx#1z\@ProcessHonor#2#3\fi\fi\fi}
-\def\@ProcessCharsZ #1#2#3{\ifx#20\@DrawTile{#15-Dora}#3\else\@DrawTile{#1#2}#3\fi}
-\def\@ProcessHonor #1#2{
+    \ifx#2~\@eaA\@TilePause%
+    \else\ifx#2?\@eaB\@DrawTileBack%
+    \else\@eaB\@ProcessCharsZ\fi\fi#1#2#3}
+\def\@ProcessCharsZ #1#2#3{%
+    \ifx#1z\@ProcessHonor#2#3\fi%
+    \ifx#1m\ifx#20\@DrawTile{Man5-Dora}#3\else\@DrawTile{Man#2}#3\fi\fi%
+    \ifx#1p\ifx#20\@DrawTile{Pin5-Dora}#3\else\@DrawTile{Pin#2}#3\fi\fi%
+    \ifx#1s\ifx#20\@DrawTile{Sou5-Dora}#3\else\@DrawTile{Sou#2}#3\fi\fi}
+\def\@ProcessHonor #1#2{%
     \ifx#11\@DrawTile{Ton}#2\fi%
     \ifx#12\@DrawTile{Nan}#2\fi%
     \ifx#13\@DrawTile{Shaa}#2\fi%
