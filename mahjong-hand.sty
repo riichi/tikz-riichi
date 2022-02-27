@@ -14,12 +14,6 @@
 \newlength{\@mahjongtilesymbolheight}
 \definecolor{tilebackcolor}{RGB}{255, 89, 89}
 
-% Series of \expandafter's useful for quitting nested conditionals.
-\def\@eaA{\expandafter}
-\def\@eaB{\expandafter\expandafter\expandafter}
-\def\@eaC{\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter}
-\def\@eaD{\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter}
-
 \def\@TilePause #1#2#3{\addtolength{\@mahjongtilexoffset}{0.5\@mahjongtilewidth}\global\@mahjongtilexoffset=\@mahjongtilexoffset}
 \def\@DrawNormalTile #1{
     \addtolength{\@mahjongtilerightedge}{\@mahjongtilewidth}
@@ -93,19 +87,27 @@
     \begin{tikzpicture}[baseline=0pt]\expandafter\@ParserHead#1\relax\relax\relax\end{tikzpicture}}
 \def\@SkipFirst #1{\@MoveHead}
 \def\@HeadStep #1#2#3{\@ProcessCharsX#1#2#3\@ParserHead#1#3}
+
+\newif\ifissuite
 \def\@MoveHead #1#2#3{%
-    \ifx#2m\@eaA\@SkipFirst%
-    \else\ifx#2p\@eaB\@SkipFirst%
-    \else\ifx#2s\@eaC\@SkipFirst%
-    \else\ifx#2z\@eaD\@SkipFirst%
-    \else\@eaD\@HeadStep\fi\fi\fi\fi#1#2#3}
+    \issuitefalse%
+    \ifx#2m\issuitetrue\fi%
+    \ifx#2p\issuitetrue\fi%
+    \ifx#2s\issuitetrue\fi%
+    \ifx#2z\issuitetrue\fi%
+    \ifissuite\expandafter\@SkipFirst%
+    \else\expandafter\@HeadStep\fi#1#2#3}
+
 \def\@EatTwo #1#2{}
 \def\@ParserHead #1#2{\ifx#2\relax\expandafter\@EatTwo\else\expandafter\@MoveHead\fi#1#2}
 \def\@ProcessCharsX #1#2#3{\ifx#2*\expandafter\relax\else\@ProcessCharsY#1#2#3\fi}
+
+\newtoks\nexttile
 \def\@ProcessCharsY #1#2#3{%
-    \ifx#2~\@eaA\@TilePause%
-    \else\ifx#2?\@eaB\@DrawTileBack%
-    \else\@eaB\@ProcessCharsZ\fi\fi#1#2#3}
+    \nexttile={\@ProcessCharsZ}%
+    \ifx#2~\nexttile={\@TilePause}\fi%
+    \ifx#2?\nexttile={\@DrawTileBack}\fi%
+    \the\nexttile#1#2#3}
 \def\@ProcessCharsZ #1#2#3{%
     \ifx#1z\@ProcessHonor#2#3\fi%
     \ifx#1m\ifx#20\@DrawTile{Man5-Dora}#3\else\@DrawTile{Man#2}#3\fi\fi%
